@@ -201,14 +201,28 @@ ABAC_PID=${ABAC_PID:-"152.3.145.138:4144"}
 ABAC_PORT=${ABAC_PORT:-7777}
 ABAC_HOST=${ABAC_HOST:-10.10.1.9}
 
-curl http://10.10.1.9:7777/postObjectAcl -d "{ \"principal\": \"10.10.1.36:1986\",  \"otherValues\": [\"10.10.1.36:MYSQL\", \"https://github.com/jerryz920/mysql-test\"] }"
+curl http://10.10.1.9:7777/postObjectAcl -d "{ \"principal\": \"10.10.1.36:1985\",  \"otherValues\": [\"10.10.1.36:MYSQL\", \"https://github.com/jerryz920/mysql\"] }"
 
 if [ -z $ABAC_HOST ]; then
   echo "must specify ABAC_HOST"
   exit 1
 fi
-sed -e 's/MY_IP/'$MY_IP'/' -e 's/ABAC_ID/'$ABAC_ID'/' -e 's/ABAC_PID/'$ABAC_PID'/' -e 's/ABAC_HOST/'$ABAC_HOST'/' -e 's/ABAC_PORT/'$ABAC_PORT'/' -e 's/localhost/127.0.0.1/' -e 's/read-only/read-write/' -e 's/abac_enabled =.*/abac_enabled = 0/' /opt/mysql-router/default-config > /opt/mysql-router-config
+
+id
+ls -lrtd /opt/
+sed -e 's/MY_IP/'$MY_IP'/' -e 's/ABAC_ID/'$ABAC_ID'/' -e 's/ABAC_PID/'$ABAC_PID'/' -e 's/ABAC_HOST/'$ABAC_HOST'/' -e 's/ABAC_PORT/'$ABAC_PORT'/' -e 's/localhost/127.0.0.1/' -e 's/read-only/read-write/' -e 's/abac_enabled =.*/abac_enabled = 1/' /opt/mysql-router/default-config > /opt/mysql-router-config
+echo 'abac_test_port = '$ABAC_TEST_PORT >> /opt/mysql-router-config
+echo 'abac_test_ip = '$ABAC_TEST_IP >> /opt/mysql-router-config
 
 mysqlrouter -c /opt/mysql-router-config &
+pid=$!
 
-exec "$@" 
+exec "$@" &
+
+# perform killing 
+while true; do
+  nc -l 0.0.0.0 1999
+  kill -SIGUSR2 $pid
+done
+
+

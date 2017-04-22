@@ -61,9 +61,26 @@ RUN sed -Ei 's/^(bind-address|log)/#&/' /etc/mysql/my.cnf \
 
 VOLUME /var/lib/mysql
 
-COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
-ENTRYPOINT ["docker-entrypoint.sh"]
 
-EXPOSE 3306
-CMD ["mysqld"]
+RUN apt-get update && apt-get install -y build-essential cmake
+
+RUN apt-get install -y git libmysqlclient-dev
+RUN apt-get install -y libcurl4-openssl-dev
+
+ENV mytest 1
+RUN git clone https://github.com/jerryz920/mysql-router /mysql-router && \
+	cd /mysql-router && git checkout dev && mkdir build && \
+	cd build && cmake .. && \
+	make -j 5 && \
+	make install
+
+RUN ln -s /mysql-router /opt/mysql-router
+
+RUN apt-get install -y net-tools curl 
+COPY docker-entrypoint.sh /usr/local/bin/
+COPY test-short.sh /usr/local/bin/
+COPY test-long.sh /usr/local/bin/
+
+EXPOSE 3307
+CMD ["bash"]
