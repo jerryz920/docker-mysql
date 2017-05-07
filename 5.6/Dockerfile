@@ -68,7 +68,7 @@ RUN apt-get update && apt-get install -y build-essential cmake
 RUN apt-get install -y git libmysqlclient-dev
 RUN apt-get install -y libcurl4-openssl-dev
 
-ENV mytest 1
+ENV mytest 0
 RUN git clone https://github.com/jerryz920/mysql-router /mysql-router && \
 	cd /mysql-router && git checkout dev && mkdir build && \
 	cd build && cmake .. && \
