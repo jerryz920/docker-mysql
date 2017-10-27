@@ -36,7 +36,7 @@ RUN set -ex; \
 	apt-key list > /dev/null
 
 ENV MYSQL_MAJOR 5.6
-ENV MYSQL_VERSION 5.6.36-1debian8
+ENV MYSQL_VERSION 5.6.38-1debian8
 
 RUN echo "deb http://repo.mysql.com/apt/debian/ jessie mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
 
@@ -82,5 +82,5 @@ COPY docker-entrypoint.sh /usr/local/bin/
 COPY test-short.sh /usr/local/bin/
 COPY test-long.sh /usr/local/bin/
 
-EXPOSE 3307
+EXPOSE 3308
 CMD ["bash"]
